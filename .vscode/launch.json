@@ -1,0 +1,19 @@
+{
+    //VS Code environment variables file to use -only- when local debugging with VS Code
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceRoot}/src",
+            "env": {
+                "PORT": "8080",
+                "SQL_CONNECTION_STRING":"host=containers-us-west-154.railway.app port=7436 user=postgres password=pggBahipuFf7RGGfh3Ho dbname=fdpd-db",
+                "GIN_MODE" : "debug",
+            },
+            "args": []
+        }
+    ]
+}
