@@ -49,6 +49,7 @@ type FormResponses struct {
 	SectionId              int    `json:"section_id,omitempty"`
 	SectionTitle           string `json:"section_title,omitempty"`
 	ScoreForEachQuestion   int    `json:"score_for_each_question,omitempty"`
+	HasScore               bool   `json:"has_score"`
 }
 
 type SectionTime struct {

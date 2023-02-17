@@ -489,7 +489,8 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 			`s.title, `+
 			`s.score_for_each_question, `+
 			`q.is_open_question, `+
-			`qt.type `+
+			`qt.type, `+
+			`q.has_score `+
 			`FROM public.answers ans `+
 			`INNER JOIN public.question q ON q.id = ans.question_id `+
 			`INNER JOIN public.question_type qt ON qt.id = q.type_id `+
@@ -515,6 +516,7 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 				&answers.ScoreForEachQuestion,
 				&answers.IsOpenQuestion,
 				&answers.QuestionType,
+				&answers.HasScore,
 			)
 			if err == nil {
 				if answers.AnswersSelectionId != 0 {
