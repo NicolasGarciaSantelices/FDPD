@@ -142,6 +142,7 @@ func GetAnswersByUserID(c *gin.Context, db *sql.DB) {
 	}
 
 	common_function.SendResponse(c, *response)
+
 }
 
 func GetFormsAnswersByUserID(c *gin.Context, db *sql.DB) {

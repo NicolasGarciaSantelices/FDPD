@@ -266,6 +266,93 @@ func GetQuestionOrder(formID int, db *sql.DB) (response []models.FieldsOrder, er
 }
 
 func InsertAnswers(answers models.FormResponse, db *sql.DB) (err error) {
+
+	//if exist prev answers for user and form, delete
+	var prevID int
+	//save answers by user
+	selectDynStmt :=
+		`SELECT id FROM public.form_answers_user ` +
+			`WHERE student_id = $1 and  form_id = $2 `
+	prevAnsRows, e := db.Query(
+		selectDynStmt,
+		answers.StudentId,
+		answers.FormId,
+	)
+
+	if e != nil {
+		utils.RecoverError()
+		return e
+	}
+	defer prevAnsRows.Close()
+	for prevAnsRows.Next() {
+		err = prevAnsRows.Scan(
+			&prevID,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	if prevID != 0 {
+		//delete times per section
+		deleteDynStmt :=
+			`DELETE FROM public.time_per_section ` +
+				`WHERE "user" = $1 ` +
+				``
+		_, e := db.Query(
+			deleteDynStmt,
+			prevID,
+		)
+
+		if e != nil {
+			utils.RecoverError()
+			return e
+		}
+
+		//delete ans per user
+		deleteDynStmt =
+			`DELETE FROM public.answers ` +
+				`WHERE form_answers_user_id = $1 ` +
+				``
+		_, e = db.Query(
+			deleteDynStmt,
+			prevID,
+		)
+
+		if e != nil {
+			utils.RecoverError()
+			return e
+		}
+
+		//delete ans per user
+		deleteDynStmt =
+			`DELETE FROM public.question_short_answer ` +
+				`WHERE form_answers_user_id = $1 ` +
+				``
+		_, e = db.Query(
+			deleteDynStmt,
+			prevID,
+		)
+
+		if e != nil {
+			utils.RecoverError()
+			return e
+		}
+		//delete form_answers_user
+		deleteDynStmt =
+			`DELETE FROM public.form_answers_user ` +
+				`WHERE id = $1 ` +
+				``
+		_, e = db.Query(
+			deleteDynStmt,
+			prevID,
+		)
+
+		if e != nil {
+			utils.RecoverError()
+			return e
+		}
+	}
 	var relationalID int
 	//save answers by user
 	insertDynStmt :=
