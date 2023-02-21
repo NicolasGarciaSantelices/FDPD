@@ -70,7 +70,7 @@ func GetSection(formID int, db *sql.DB) (response models.Sections, err error) {
 
 func GetQuestion(sectionID int, db *sql.DB) (response models.FieldsData, err error) {
 	rows, err := db.Query(`SELECT `+
-		`COALESCE(q.description,''), qt.type, q.id `+
+		`COALESCE(q.description,''), qt.type, q.id,COALESCE(q.image_url,''),COALESCE(q.title,''),COALESCE(q.question_description,'')  `+
 		`FROM public.section_questions sq `+
 		`INNER JOIN public.section s ON s.id = sq.section_id `+
 		`INNER JOIN public.question q ON q.id = sq.question_id `+
@@ -87,8 +87,20 @@ func GetQuestion(sectionID int, db *sql.DB) (response models.FieldsData, err err
 			&question.Label,
 			&question.Type,
 			&question.Id,
+			&question.ImgURL,
+			&question.Title,
+			&question.QuestionDescription,
 		)
 		if err == nil {
+			if *question.ImgURL == "" {
+				question.ImgURL = nil
+			}
+			if *question.Title == "" {
+				question.Title = nil
+			}
+			if *question.QuestionDescription == "" {
+				question.QuestionDescription = nil
+			}
 			question.Section = sectionID
 			question.Required = true
 
