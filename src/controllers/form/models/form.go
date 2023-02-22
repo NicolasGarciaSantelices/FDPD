@@ -45,11 +45,14 @@ type FormResponses struct {
 	IsOpenQuestion         bool   `json:"is_open_question"`
 	Answer                 string `json:"answer,omitempty"`
 	AnswerInt              int
-	IsCorrect              *bool  `json:"is_correct,omitempty"`
-	SectionId              int    `json:"section_id,omitempty"`
-	SectionTitle           string `json:"section_title,omitempty"`
-	ScoreForEachQuestion   int    `json:"score_for_each_question,omitempty"`
-	HasScore               bool   `json:"has_score"`
+	IsCorrect              *bool   `json:"is_correct,omitempty"`
+	SectionId              int     `json:"section_id,omitempty"`
+	SectionTitle           string  `json:"section_title,omitempty"`
+	ScoreForEachQuestion   int     `json:"score_for_each_question,omitempty"`
+	HasScore               bool    `json:"has_score"`
+	ImgURL                 *string `json:"image_url,omitempty"`
+	Title                  *string `json:"title,omitempty"`
+	QuestionDescription    *string `json:"question_description,omitempty"`
 }
 
 type SectionTime struct {

@@ -90,6 +90,7 @@ func GetQuestion(sectionID int, db *sql.DB) (response models.FieldsData, err err
 			&question.ImgURL,
 			&question.Title,
 			&question.QuestionDescription,
+			&question.ImgURL,
 		)
 		if err == nil {
 			if *question.ImgURL == "" {
@@ -589,7 +590,10 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 			`s.score_for_each_question, `+
 			`q.is_open_question, `+
 			`qt.type, `+
-			`q.has_score `+
+			`q.has_score, `+
+			`COALESCE(q.image_url,''), `+
+			`COALESCE(q.title,''), `+
+			`COALESCE(q.question_description,'')  `+
 			`FROM public.answers ans `+
 			`INNER JOIN public.question q ON q.id = ans.question_id `+
 			`INNER JOIN public.question_type qt ON qt.id = q.type_id `+
@@ -616,8 +620,20 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 				&answers.IsOpenQuestion,
 				&answers.QuestionType,
 				&answers.HasScore,
+				&answers.Title,
+				&answers.QuestionDescription,
+				&answers.ImgURL,
 			)
 			if err == nil {
+				if *answers.ImgURL == "" {
+					answers.ImgURL = nil
+				}
+				if *answers.Title == "" {
+					answers.Title = nil
+				}
+				if *answers.QuestionDescription == "" {
+					answers.QuestionDescription = nil
+				}
 				if answers.AnswersSelectionId != 0 {
 					rowsPerAns, err := db.Query(`SELECT `+
 						`qso.option,is_correct `+
