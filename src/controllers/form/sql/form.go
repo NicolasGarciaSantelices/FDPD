@@ -90,7 +90,6 @@ func GetQuestion(sectionID int, db *sql.DB) (response models.FieldsData, err err
 			&question.ImgURL,
 			&question.Title,
 			&question.QuestionDescription,
-			&question.ImgURL,
 		)
 		if err == nil {
 			if *question.ImgURL == "" {
