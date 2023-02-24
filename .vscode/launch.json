@@ -10,7 +10,7 @@
             "program": "${workspaceRoot}/src",
             "env": {
                 "PORT": "8080",
-                "SQL_CONNECTION_STRING":"host=containers-us-west-154.railway.app port=7436 user=postgres password=pggBahipuFf7RGGfh3Ho dbname=fdpd-db",
+                "SQL_CONNECTION_STRING":"host=dpg-cfrp3f1gp3jo1ds89nrg-a.oregon-postgres.render.com port=5432 user=fdpd_user password=ctZFq4WzE72XltAku4dDHYdRBcObuQKI dbname=fdpd",
                 "GIN_MODE" : "debug",
             },
             "args": []

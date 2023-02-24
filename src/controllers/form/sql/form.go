@@ -220,7 +220,7 @@ func GetLinearLegend(QuestionId int, db *sql.DB) (*models.Legend, string, int, e
 
 func GetLinearOptions(questionID int, db *sql.DB) (response []models.OptionsFields, err error) {
 	rows, err := db.Query(`SELECT `+
-		`qso.id,qso.option `+
+		`qso.id,qso.option,COALESCE(qso.image_url) `+
 		`FROM public.question_linear_option qso `+
 		`INNER JOIN public.question q ON q.id = qso.question_id `+
 		`WHERE q.id = $1`, questionID)
@@ -234,6 +234,7 @@ func GetLinearOptions(questionID int, db *sql.DB) (response []models.OptionsFiel
 		err = rows.Scan(
 			&options.Id,
 			&options.Label,
+			&options.ImageURL,
 		)
 		if err == nil {
 			options.Custom = false
