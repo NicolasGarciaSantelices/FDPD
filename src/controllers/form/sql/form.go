@@ -591,9 +591,9 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 			`q.is_open_question, `+
 			`qt.type, `+
 			`q.has_score, `+
-			`COALESCE(q.image_url,''), `+
 			`COALESCE(q.title,''), `+
-			`COALESCE(q.question_description,'')  `+
+			`COALESCE(q.question_description,''),  `+
+			`COALESCE(q.image_url,'') `+
 			`FROM public.answers ans `+
 			`INNER JOIN public.question q ON q.id = ans.question_id `+
 			`INNER JOIN public.question_type qt ON qt.id = q.type_id `+
@@ -657,7 +657,7 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 				}
 				if answers.AnswersOptionId != 0 {
 					rowsPerAns, err := db.Query(`SELECT `+
-						`COALESCE(q.description,''),qso.option `+
+						`COALESCE(q.description,''),qso.option, qso.is_correct,qso.image_url `+
 						`FROM public.question_linear_option qso `+
 						`INNER JOIN public.answers a ON a.answers_option_id = qso.id `+
 						`INNER JOIN public.question_linear q ON q.question_id = qso.question_id `+
@@ -671,6 +671,8 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 						_ = rowsPerAns.Scan(
 							&answers.Question,
 							&answers.AnswerInt,
+							&answers.IsCorrect,
+							&answers.ImgURL,
 						)
 					}
 					if err = rowsPerAns.Err(); err != nil {
