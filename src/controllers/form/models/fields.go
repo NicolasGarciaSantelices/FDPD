@@ -13,6 +13,7 @@ type FieldData struct {
 	Legend              *Legend         `json:"legend,omitempty"`
 	Options             []OptionsFields `json:"options,omitempty"`
 	Required            bool            `json:"required"`
+	InputText           bool            `json:"input_text"`
 }
 
 type FieldsOrder struct {

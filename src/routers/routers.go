@@ -45,7 +45,6 @@ func EndpointGroup(Engine *gin.Engine, db *sql.DB) error {
 
 		}
 
-		// TODO: endpoint para crear, obtener y todo lo relacionado con preguntas/respuestas
 		form := api.Group("/form")
 		{
 			form.GET("/get", func(c *gin.Context) {
