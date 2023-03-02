@@ -906,3 +906,70 @@ func InsertAssigneScore(assigneScore models.AssigneScore, db *sql.DB) (err error
 	}
 	return
 }
+
+func GetIndicatorsSql(db *sql.DB) (form models.Indicators, err error) {
+
+	var CarrersIndicator models.CarrerIndicator
+	rows, err := db.Query(`SELECT ` +
+		`g.gender_name,f.id,f.title ` +
+		`FROM public.form_answers_user as fau ` +
+		`INNER JOIN public.student s ON s.id = fau.student_id ` +
+		`INNER JOIN public.gender g ON g.id = s.gender_id ` +
+		`INNER JOIN public.form f ON fau.form_id = f .id `)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+
+		var genderType string
+
+		err = rows.Scan(
+			&genderType,
+			&form.FormID,
+			&form.FormName,
+		)
+		if err == nil {
+			form.Gender.Total++
+			if genderType == "male" {
+				form.Gender.Men++
+			} else {
+				form.Gender.Women++
+			}
+		}
+
+	}
+	if err = rows.Err(); err != nil {
+		panic(err)
+	}
+
+	rows, err = db.Query(`SELECT ` +
+		`c.name,c.id ` +
+		`FROM public.form_answers_user as fau ` +
+		`INNER JOIN public.student s ON s.id = fau.student_id ` +
+		`INNER JOIN public.career c ON c.id = s.career_id ` +
+		`INNER JOIN public.form f ON fau.form_id = f .id `)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var CarrerIndicator models.Carrers
+
+		err = rows.Scan(
+			&CarrerIndicator.Career,
+			&CarrerIndicator.CareerID,
+		)
+		if err == nil {
+			CarrersIndicator.Total++
+			CarrersIndicator.Carrers = append(CarrersIndicator.Carrers, CarrerIndicator)
+		}
+
+	}
+	if err = rows.Err(); err != nil {
+		panic(err)
+	}
+	form.Carrer = CarrersIndicator
+
+	return
+}

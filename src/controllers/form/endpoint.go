@@ -285,3 +285,26 @@ func AssigneScores(c *gin.Context, db *sql.DB) {
 	}
 	common_function.SendResponse(c, *response)
 }
+
+func GetIndicators(c *gin.Context, db *sql.DB) {
+	var (
+		response *common_models.Response
+	)
+
+	if indicators, err := form_sql.GetIndicatorsSql(db); err == nil {
+		response = &common_models.Response{
+			Status:   constant.SuccesStatus,
+			Code:     http.StatusOK,
+			Messages: constant.GetIndicatorsSucces,
+			Data:     indicators,
+		}
+	} else {
+		response = &common_models.Response{
+			Status:   constant.InsertAnsErrorStatus,
+			Code:     http.StatusBadRequest,
+			Messages: err.Error(),
+		}
+	}
+
+	common_function.SendResponse(c, *response)
+}

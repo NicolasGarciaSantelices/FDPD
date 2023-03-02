@@ -93,6 +93,13 @@ func EndpointGroup(Engine *gin.Engine, db *sql.DB) error {
 
 		}
 
+		ind := api.Group("/indicators")
+		{
+			ind.GET("", func(c *gin.Context) {
+				form_controller.GetIndicators(c, db)
+			})
+		}
+
 	}
 
 	return nil
