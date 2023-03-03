@@ -14,6 +14,7 @@ type FieldData struct {
 	Options             []OptionsFields `json:"options,omitempty"`
 	Required            bool            `json:"required"`
 	InputText           bool            `json:"input_text"`
+	ImgTitle            string          `json:"img_title,omitempty"`
 }
 
 type FieldsOrder struct {
