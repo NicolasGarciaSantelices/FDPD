@@ -2,7 +2,6 @@ package sql
 
 import (
 	"database/sql"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -629,9 +628,6 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 				&answers.ImgURL,
 			)
 			if err == nil {
-				if answers.QuestionId == 41 {
-					fmt.Println(answers)
-				}
 				if *answers.ImgURL != "" {
 					answers.QuestionHasImage = true
 				}
