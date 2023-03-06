@@ -675,17 +675,17 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 							&answers.AnsDescription,
 							&answers.Answer,
 							&answers.IsCorrect,
-							&answers.ImgURL,
+							&answers.AnswerImgURL,
 						)
 					}
 					if err = rowsPerAns.Err(); err != nil {
 						panic(err)
 					}
-					if answers.AnsDescription != "" {
+					/* 	if answers.AnsDescription != "" {
 						answers.Answer = answers.AnsDescription
-					}
+					} */
 					answerInt, err := strconv.Atoi(answers.Answer)
-					if err == nil {
+					if err == nil && answers.SectionId == 3 {
 						ans := qli[answerInt]
 						if ans != "" {
 							answers.Answer = ans

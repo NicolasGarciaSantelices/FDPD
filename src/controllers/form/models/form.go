@@ -42,7 +42,7 @@ type FormResponses struct {
 	AnswersSelectionId     int    `json:"answers_selection_id,omitempty"`
 	AssigneScore           *int   `json:"assigne_score,omitempty"`
 	Question               string `json:"question,omitempty"`
-	AnsDescription         string `json:"answer_description,omitempty"`
+	AnsDescription         string `json:"short_question_description,omitempty"`
 	IsOpenQuestion         bool   `json:"is_open_question"`
 	Answer                 string `json:"answer,omitempty"`
 	AnswerInt              int
@@ -54,6 +54,7 @@ type FormResponses struct {
 	ImgURL                 *string `json:"image_url,omitempty"`
 	Title                  *string `json:"title,omitempty"`
 	QuestionDescription    *string `json:"question_description,omitempty"`
+	AnswerImgURL           *string `json:"answer_image_url,omitempty"`
 	QuestionHasImage       bool    `json:"question_has_image"`
 }
 
