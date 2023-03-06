@@ -672,7 +672,7 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 					defer rowsPerAns.Close()
 					for rowsPerAns.Next() {
 						_ = rowsPerAns.Scan(
-							&answers.Question,
+							&answers.AnsDescription,
 							&answers.Answer,
 							&answers.IsCorrect,
 							&answers.ImgURL,
@@ -681,9 +681,15 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 					if err = rowsPerAns.Err(); err != nil {
 						panic(err)
 					}
+					if answers.AnsDescription != "" {
+						answers.Answer = answers.AnsDescription
+					}
 					answerInt, err := strconv.Atoi(answers.Answer)
 					if err == nil {
-						answers.Answer = qli[answerInt]
+						ans := qli[answerInt]
+						if ans != "" {
+							answers.Answer = ans
+						}
 					}
 				}
 				if answers.AnswersItemId != 0 {

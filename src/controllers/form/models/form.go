@@ -42,6 +42,7 @@ type FormResponses struct {
 	AnswersSelectionId     int    `json:"answers_selection_id,omitempty"`
 	AssigneScore           *int   `json:"assigne_score,omitempty"`
 	Question               string `json:"question,omitempty"`
+	AnsDescription         string `json:"answer_description,omitempty"`
 	IsOpenQuestion         bool   `json:"is_open_question"`
 	Answer                 string `json:"answer,omitempty"`
 	AnswerInt              int
