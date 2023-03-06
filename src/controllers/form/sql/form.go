@@ -2,6 +2,8 @@ package sql
 
 import (
 	"database/sql"
+	"fmt"
+	"strconv"
 	"time"
 
 	"FDPD-BACKEND/src/controllers/form/models"
@@ -627,8 +629,11 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 				&answers.ImgURL,
 			)
 			if err == nil {
-				if *answers.ImgURL == "" {
-					answers.ImgURL = nil
+				if answers.QuestionId == 41 {
+					fmt.Println(answers)
+				}
+				if *answers.ImgURL != "" {
+					answers.QuestionHasImage = true
 				}
 				if *answers.Title == "" {
 					answers.Title = nil
@@ -672,7 +677,7 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 					for rowsPerAns.Next() {
 						_ = rowsPerAns.Scan(
 							&answers.Question,
-							&answers.AnswerInt,
+							&answers.Answer,
 							&answers.IsCorrect,
 							&answers.ImgURL,
 						)
@@ -680,8 +685,10 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 					if err = rowsPerAns.Err(); err != nil {
 						panic(err)
 					}
-
-					answers.Answer = qli[answers.AnswerInt]
+					answerInt, err := strconv.Atoi(answers.Answer)
+					if err == nil {
+						answers.Answer = qli[answerInt]
+					}
 				}
 				if answers.AnswersItemId != 0 {
 					rowsPerAns, err := db.Query(`SELECT `+

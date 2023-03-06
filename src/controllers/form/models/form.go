@@ -53,6 +53,7 @@ type FormResponses struct {
 	ImgURL                 *string `json:"image_url,omitempty"`
 	Title                  *string `json:"title,omitempty"`
 	QuestionDescription    *string `json:"question_description,omitempty"`
+	QuestionHasImage       bool    `json:"question_has_image"`
 }
 
 type SectionTime struct {
