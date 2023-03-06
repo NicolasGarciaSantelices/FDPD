@@ -686,6 +686,7 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 					} */
 					answerInt, err := strconv.Atoi(answers.Answer)
 					if err == nil && answers.SectionId == 3 {
+						answers.AnswerInt = answerInt
 						ans := qli[answerInt]
 						if ans != "" {
 							answers.Answer = ans
