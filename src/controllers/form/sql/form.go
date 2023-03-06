@@ -2,6 +2,7 @@ package sql
 
 import (
 	"database/sql"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -628,6 +629,9 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 				&answers.ImgURL,
 			)
 			if err == nil {
+				if answers.QuestionId == 39 {
+					fmt.Print()
+				}
 				if *answers.ImgURL != "" {
 					answers.QuestionHasImage = true
 				}
@@ -734,6 +738,7 @@ func GetAnswers(answers models.FormResponse, db *sql.DB, userID, formID int) (Fo
 					}
 				}
 				FormResponse.FormResponses = append(FormResponse.FormResponses, answers)
+				answers = models.FormResponses{}
 			}
 
 		}
