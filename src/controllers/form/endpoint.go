@@ -12,6 +12,7 @@ import (
 	"FDPD-BACKEND/src/controllers/form/models"
 	form_sql "FDPD-BACKEND/src/controllers/form/sql"
 	"FDPD-BACKEND/src/controllers/user/constant"
+	user_models "FDPD-BACKEND/src/controllers/user/models"
 )
 
 func GetForms(c *gin.Context, db *sql.DB) {
@@ -307,4 +308,40 @@ func GetIndicators(c *gin.Context, db *sql.DB) {
 	}
 
 	common_function.SendResponse(c, *response)
+}
+
+func GetAnswersByUsersID(c *gin.Context, db *sql.DB) {
+	var (
+		answersArray *[]models.FormResponse
+		answers      *models.FormResponse
+		response     *common_models.Response
+		err          error
+
+		usersRequest *user_models.UsersRequest
+	)
+	answersArray = &[]models.FormResponse{}
+	answers = &models.FormResponse{}
+
+	if err = c.ShouldBindJSON(&usersRequest); err == nil {
+		for _, userRequest := range usersRequest.Users {
+
+			if ans, err := form_sql.GetAnswersArray(*answers, db, userRequest.User, userRequest.Form); err == nil {
+				*answersArray = append(*answersArray, ans)
+			}
+		}
+	} else {
+		response = &common_models.Response{
+			Status:   constant.InsertAnsErrorStatus,
+			Code:     http.StatusBadRequest,
+			Messages: err.Error(),
+		}
+	}
+	response = &common_models.Response{
+		Status:   constant.SuccesStatus,
+		Code:     http.StatusOK,
+		Messages: constant.GetIndicatorsSucces,
+		Data:     answersArray,
+	}
+	common_function.SendResponse(c, *response)
+
 }

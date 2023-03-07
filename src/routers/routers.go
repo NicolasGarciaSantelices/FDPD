@@ -72,6 +72,9 @@ func EndpointGroup(Engine *gin.Engine, db *sql.DB) error {
 			ans.GET("/form/:formID", func(c *gin.Context) {
 				form_controller.GetFormsAnswersByForms(c, db)
 			})
+			ans.POST("/forms", func(c *gin.Context) {
+				form_controller.GetAnswersByUsersID(c, db)
+			})
 			ans.POST("/input", func(c *gin.Context) {
 				form_controller.InputAnswer(c, db)
 			})

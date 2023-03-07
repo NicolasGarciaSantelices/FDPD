@@ -19,3 +19,12 @@ type User struct {
 type UserResponse struct {
 	Users []User `json:"users"`
 }
+
+type UserRequest struct {
+	User int `json:"user_id,omitempty"`
+	Form int `json:"form_id,omitempty"`
+}
+
+type UsersRequest struct {
+	Users []UserRequest `json:"users,omitempty"`
+}

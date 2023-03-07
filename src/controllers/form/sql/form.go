@@ -990,3 +990,254 @@ func GetIndicatorsSql(db *sql.DB) (form models.Indicators, err error) {
 
 	return
 }
+
+func GetAnswersArray(answers models.FormResponse, db *sql.DB, userID, formID int) (FormResponse models.FormResponse, err error) {
+	var qli map[int]string
+
+	FormResponse.FormId = formID
+	FormResponse.StudentId = userID
+	var idFormResponse int
+
+	//obtencion de tipos de respuesta de acuerdo etc.
+	qli = make(map[int]string)
+	rowsItem, err := db.Query(`SELECT "order",item ` +
+		`FROM public.question_linear_item `)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer rowsItem.Close()
+	for rowsItem.Next() {
+		var (
+			order int
+			item  string
+		)
+		err = rowsItem.Scan(
+			&order,
+			&item,
+		)
+		if err == nil {
+			qli[order] = item
+		}
+
+	}
+	// obtencion de formularios respondidos por el usuario
+	var FormResponses []int
+	rows, err := db.Query(`SELECT `+
+		`id,date `+
+		`FROM public.form_answers_user as fau `+
+		`WHERE fau.student_id = $1 and fau.form_id = $2`, userID, formID)
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+
+		err = rows.Scan(
+			&idFormResponse,
+			&FormResponse.Date,
+		)
+		if err == nil {
+			FormResponses = append(FormResponses, idFormResponse)
+		}
+
+	}
+	if err = rows.Err(); err != nil {
+		panic(err)
+	}
+
+	//obtencion de respuestas por formulario
+	for _, formResponses := range FormResponses {
+		var answers models.FormResponses
+		answers.IsCorrect = nil
+		rows, err = db.Query(`SELECT `+
+			`COALESCE(q.description,'sin descripcion'),`+
+			`COALESCE(ans.answers_option_id,0),`+
+			`COALESCE(ans.answers_selection_id,0), `+
+			`COALESCE(ans.answers_item_id,0), `+
+			`COALESCE(ans.answer_short_id,0), `+
+			`ans.assigne_score, `+
+			`ans.question_id, `+
+			`sq.section_id, `+
+			`s.title, `+
+			`s.score_for_each_question, `+
+			`q.is_open_question, `+
+			`qt.type, `+
+			`q.has_score, `+
+			`COALESCE(q.title,''), `+
+			`COALESCE(q.question_description,''),  `+
+			`COALESCE(q.image_url,'') `+
+			`FROM public.answers ans `+
+			`INNER JOIN public.question q ON q.id = ans.question_id `+
+			`INNER JOIN public.question_type qt ON qt.id = q.type_id `+
+			`INNER JOIN public.section_questions sq ON q.id = sq.question_id `+
+			`INNER JOIN public.section s ON s.id = sq.section_id `+
+			`WHERE ans.form_answers_user_id = $1 ORDER BY question_id ASC `, formResponses)
+		if err != nil {
+			panic(err)
+		}
+
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(
+				&answers.Question,
+				&answers.AnswersOptionId,
+				&answers.AnswersSelectionId,
+				&answers.AnswersItemId,
+				&answers.AnswersShortQuestionId,
+				&answers.AssigneScore,
+				&answers.QuestionId,
+				&answers.SectionId,
+				&answers.SectionTitle,
+				&answers.ScoreForEachQuestion,
+				&answers.IsOpenQuestion,
+				&answers.QuestionType,
+				&answers.HasScore,
+				&answers.Title,
+				&answers.QuestionDescription,
+				&answers.ImgURL,
+			)
+			if err == nil {
+				if *answers.ImgURL != "" {
+					answers.QuestionHasImage = true
+				}
+				if *answers.Title == "" {
+					answers.Title = nil
+				}
+				if *answers.QuestionDescription == "" {
+					answers.QuestionDescription = nil
+				}
+				if answers.AnswersSelectionId != 0 {
+					rowsPerAns, err := db.Query(`SELECT `+
+						`qso.option,is_correct `+
+						`FROM public.question_selection_option qso `+
+						`INNER JOIN public.answers a ON a.answers_selection_id = qso.id `+
+						`WHERE a.answers_selection_id = $1 `, answers.AnswersSelectionId)
+					if err != nil {
+						panic(err)
+					}
+
+					defer rowsPerAns.Close()
+					for rowsPerAns.Next() {
+						_ = rowsPerAns.Scan(
+							&answers.Answer,
+							&answers.IsCorrect,
+						)
+					}
+					if err = rowsPerAns.Err(); err != nil {
+						panic(err)
+					}
+				}
+				if answers.AnswersOptionId != 0 {
+					rowsPerAns, err := db.Query(`SELECT `+
+						`COALESCE(q.description,''),qso.option, qso.is_correct,qso.image_url `+
+						`FROM public.question_linear_option qso `+
+						`INNER JOIN public.answers a ON a.answers_option_id = qso.id `+
+						`INNER JOIN public.question_linear q ON q.question_id = qso.question_id `+
+						`WHERE a.answers_option_id = $1 `, answers.AnswersOptionId)
+					if err != nil {
+						panic(err)
+					}
+
+					defer rowsPerAns.Close()
+					for rowsPerAns.Next() {
+						_ = rowsPerAns.Scan(
+							&answers.AnsDescription,
+							&answers.Answer,
+							&answers.IsCorrect,
+							&answers.AnswerImgURL,
+						)
+					}
+					if err = rowsPerAns.Err(); err != nil {
+						panic(err)
+					}
+					/* 	if answers.AnsDescription != "" {
+						answers.Answer = answers.AnsDescription
+					} */
+					answerInt, err := strconv.Atoi(answers.Answer)
+					if err == nil && answers.SectionId == 3 {
+						ans := qli[answerInt]
+						if ans != "" {
+							answers.Answer = ans
+						}
+					}
+				}
+				if answers.AnswersItemId != 0 {
+					rowsPerAns, err := db.Query(`SELECT `+
+						`qso.option `+
+						`FROM public.question_linear_item qso `+
+						`INNER JOIN public.answers a ON a.answers_item_id = qso.id `+
+						`WHERE a.answers_item_id = $1 `, answers.AnswersItemId)
+					if err != nil {
+						panic(err)
+					}
+
+					defer rowsPerAns.Close()
+					for rowsPerAns.Next() {
+						_ = rowsPerAns.Scan(
+							&answers.Answer,
+						)
+					}
+					if err = rowsPerAns.Err(); err != nil {
+						panic(err)
+					}
+				}
+				if answers.AnswersShortQuestionId != 0 {
+					answers.IsCorrect = nil
+					rowsPerAns, err := db.Query(`SELECT `+
+						`qsa.answer `+
+						`FROM public.question_short_answer qsa `+
+						`WHERE id = $1 `, answers.AnswersShortQuestionId)
+					if err != nil {
+						panic(err)
+					}
+
+					defer rowsPerAns.Close()
+					for rowsPerAns.Next() {
+						_ = rowsPerAns.Scan(
+							&answers.Answer,
+						)
+					}
+					if err = rowsPerAns.Err(); err != nil {
+						panic(err)
+					}
+				}
+				FormResponse.FormResponses = append(FormResponse.FormResponses, answers)
+			}
+
+		}
+		if err = rows.Err(); err != nil {
+			panic(err)
+		}
+	}
+
+	//obtencion de tiempos por seccion
+	rows, err = db.Query(`SELECT `+
+		`section_id,`+
+		`time_in_seconds `+
+		`FROM public.time_per_section as tps `+
+		`WHERE tps."user" = $1`, idFormResponse)
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var SectionTime models.SectionTime
+		err = rows.Scan(
+			&SectionTime.SectionID,
+			&SectionTime.SectionTime,
+		)
+		if err == nil {
+			FormResponse.SectionTime = append(FormResponse.SectionTime, SectionTime)
+		}
+
+	}
+	if err = rows.Err(); err != nil {
+		panic(err)
+	}
+
+	return
+}
