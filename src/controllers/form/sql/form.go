@@ -842,7 +842,7 @@ func GetAllFormAns(answers models.FormResponse, db *sql.DB) (Forms models.Forms,
 
 func GetAllFormAnsByFormId(answers models.FormResponse, db *sql.DB, formId int) (Forms models.Forms, err error) {
 	rows, err := db.Query(`SELECT `+
-		`s.id,s.full_name,c.name,f.id,f.title,fau.date `+
+		`s.id,s.full_name,c.name,f.id,f.title,fau.date,s.rut `+
 		`FROM public.form_answers_user as fau `+
 		`INNER JOIN public.student s ON s.id = fau.student_id `+
 		`INNER JOIN public.career c ON c.id = s.career_id `+
@@ -862,6 +862,7 @@ func GetAllFormAnsByFormId(answers models.FormResponse, db *sql.DB, formId int) 
 			&form.FormId,
 			&form.FormTitle,
 			&form.FormDate,
+			&form.Rut,
 		)
 		if err == nil {
 			Forms.FormId = append(Forms.FormId, form)

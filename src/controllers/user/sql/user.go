@@ -9,7 +9,9 @@ import (
 )
 
 func CreateStudent(users models.User, db *sql.DB) (err error) {
-	password := strings.Replace((strings.Split(users.RUT, "-"))[0], ".", "", -3)
+	users.RUT = strings.Replace(users.RUT, ".", "", -3)
+	users.RUT = strings.Replace(users.RUT, "-", "", -1)
+	password := users.RUT[len(users.RUT)-4:]
 	insertDynStmt :=
 		`INSERT INTO public.student
 	(first_name, last_name, full_name, career_id, rut, gender_id, email, "password")

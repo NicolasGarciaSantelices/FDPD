@@ -7,6 +7,7 @@ type Form struct {
 	StudentId   int    `json:"student_id,omitempty"`
 	StudentName string `json:"student_full_name,omitempty"`
 	CarrerName  string `json:"carrer_name,omitempty"`
+	Rut         string `json:"rut,omitempty"`
 	// Form table values
 	FormId     int    `json:"form_id"`
 	FormTitle  string `json:"form_title,omitempty"`
