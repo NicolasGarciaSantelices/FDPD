@@ -178,6 +178,7 @@ func UserExist(login models.Login, db *sql.DB) (user models.User) {
 }
 
 func UpdateUserInfo(userUpdate models.User, db *sql.DB) (err error) {
+
 	insertDynStmt :=
 		`UPDATE public.student SET ` +
 			`first_name = $1, ` +
@@ -187,7 +188,7 @@ func UpdateUserInfo(userUpdate models.User, db *sql.DB) (err error) {
 			`rut = $5, ` +
 			`gender_id = $6, ` +
 			`email = $7 ` +
-			`WHERE email = $8 `
+			`WHERE id = $8 `
 
 	_, e := db.Exec(
 		insertDynStmt,
@@ -198,7 +199,7 @@ func UpdateUserInfo(userUpdate models.User, db *sql.DB) (err error) {
 		userUpdate.RUT,
 		userUpdate.GenderID,
 		userUpdate.Email,
-		userUpdate.Email)
+		userUpdate.UserId)
 	if e != nil {
 		utils.RecoverError()
 		return e
